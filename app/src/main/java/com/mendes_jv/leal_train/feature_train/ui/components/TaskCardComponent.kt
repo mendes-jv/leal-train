@@ -1,4 +1,4 @@
-package com.mendes_jv.leal_train.feature_tasks.ui.components
+package com.mendes_jv.leal_train.feature_train.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement

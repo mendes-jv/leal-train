@@ -1,12 +1,12 @@
-package com.mendes_jv.leal_train.feature_tasks.viewmodel // ktlint-disable package-name
+package com.mendes_jv.leal_train.feature_train.viewmodel // ktlint-disable package-name
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mendes_jv.leal_train.common.Result
 import com.mendes_jv.leal_train.data.repositories.TrainRepository
-import com.mendes_jv.leal_train.feature_tasks.events.TasksScreenUiEvent
-import com.mendes_jv.leal_train.feature_tasks.side_effects.TaskScreenSideEffects
-import com.mendes_jv.leal_train.feature_tasks.state.TasksScreenUiState
+import com.mendes_jv.leal_train.feature_train.events.TrainScreenUiEvent
+import com.mendes_jv.leal_train.feature_train.side_effects.TrainScreenSideEffects
+import com.mendes_jv.leal_train.feature_train.state.TrainScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,73 +17,74 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TasksViewModel @Inject constructor(private val trainRepository: TrainRepository) : ViewModel() {
+class TrainViewModel @Inject
+    constructor(private val trainRepository: TrainRepository) : ViewModel() {
 
-    private val _state: MutableStateFlow<TasksScreenUiState> =
-        MutableStateFlow(TasksScreenUiState())
-    val state: StateFlow<TasksScreenUiState> = _state.asStateFlow()
+    private val _state: MutableStateFlow<TrainScreenUiState> =
+        MutableStateFlow(TrainScreenUiState())
+    val state: StateFlow<TrainScreenUiState> = _state.asStateFlow()
 
-    private val _effect: Channel<TaskScreenSideEffects> = Channel()
+    private val _effect: Channel<TrainScreenSideEffects> = Channel()
     val effect = _effect.receiveAsFlow()
 
     init {
-        sendEvent(TasksScreenUiEvent.GetTasks)
+        sendEvent(TrainScreenUiEvent.GetTrain)
     }
 
-    fun sendEvent(event: TasksScreenUiEvent) {
+    fun sendEvent(event: TrainScreenUiEvent) {
         reduce(oldState = _state.value, event = event)
     }
 
-    private fun setEffect(builder: () -> TaskScreenSideEffects) {
+    private fun setEffect(builder: () -> TrainScreenSideEffects) {
         val effectValue = builder()
         viewModelScope.launch { _effect.send(effectValue) }
     }
 
-    private fun setState(newState: TasksScreenUiState) {
+    private fun setState(newState: TrainScreenUiState) {
         _state.value = newState
     }
 
-    private fun reduce(oldState: TasksScreenUiState, event: TasksScreenUiEvent) {
+    private fun reduce(oldState: TrainScreenUiState, event: TrainScreenUiEvent) {
         when (event) {
-            is TasksScreenUiEvent.AddTask -> {
-                addTask(oldState = oldState, title = event.title, body = event.body)
+            is TrainScreenUiEvent.AddTrain -> {
+                addTask(t)
             }
 
-            is TasksScreenUiEvent.DeleteNote -> {
+            is TrainScreenUiEvent.DeleteTrain -> {
                 deleteNote(oldState = oldState, taskId = event.taskId)
             }
 
-            TasksScreenUiEvent.GetTasks -> {
+            TrainScreenUiEvent.GetTrain -> {
                 getTasks(oldState = oldState)
             }
 
-            is TasksScreenUiEvent.OnChangeAddTaskDialogState -> {
+            is TrainScreenUiEvent.OnChangeAddTrainDialogState -> {
                 onChangeAddTaskDialog(oldState = oldState, isShown = event.show)
             }
 
-            is TasksScreenUiEvent.OnChangeUpdateTaskDialogState -> {
+            is TrainScreenUiEvent.OnChangeUpdateTrainDialogState -> {
                 onUpdateAddTaskDialog(oldState = oldState, isShown = event.show)
             }
 
-            is TasksScreenUiEvent.OnChangeTaskBody -> {
+            is TrainScreenUiEvent.OnChangeTaskBody -> {
                 onChangeTaskBody(oldState = oldState, body = event.body)
             }
 
-            is TasksScreenUiEvent.OnChangeTaskTitle -> {
+            is TrainScreenUiEvent.OnChangeTrainDescription -> {
                 onChangeTaskTitle(oldState = oldState, title = event.title)
             }
 
-            is TasksScreenUiEvent.SetTaskToBeUpdated -> {
-                setTaskToBeUpdated(oldState = oldState, task = event.taskToBeUpdated)
+            is TrainScreenUiEvent.SetTrainToBeUpdated -> {
+                setTaskToBeUpdated(oldState = oldState, task = event.trainToBeUpdated)
             }
 
-            TasksScreenUiEvent.UpdateNote -> {
+            TrainScreenUiEvent.UpdateTrain -> {
                 updateNote(oldState = oldState)
             }
         }
     }
 
-    private fun addTask(title: String, body: String, oldState: TasksScreenUiState) {
+    private fun addTask(title: String, body: String, oldState: TrainScreenUiState) {
         viewModelScope.launch {
             setState(oldState.copy(isLoading = true))
 
@@ -93,7 +94,7 @@ class TasksViewModel @Inject constructor(private val trainRepository: TrainRepos
 
                     val errorMessage =
                         result.exception.message ?: "An error occurred when adding task"
-                    setEffect { TaskScreenSideEffects.ShowSnackBarMessage(message = errorMessage) }
+                    setEffect { TrainScreenSideEffects.ShowSnackBarMessage(message = errorMessage) }
                 }
 
                 is Result.Success -> {
@@ -105,17 +106,17 @@ class TasksViewModel @Inject constructor(private val trainRepository: TrainRepos
                         ),
                     )
 
-                    sendEvent(TasksScreenUiEvent.OnChangeAddTaskDialogState(show = false))
+                    sendEvent(TrainScreenUiEvent.OnChangeAddTrainDialogState(show = false))
 
-                    sendEvent(TasksScreenUiEvent.GetTasks)
+                    sendEvent(TrainScreenUiEvent.GetTrain)
 
-                    setEffect { TaskScreenSideEffects.ShowSnackBarMessage(message = "Task added successfully") }
+                    setEffect { TrainScreenSideEffects.ShowSnackBarMessage(message = "Task added successfully") }
                 }
             }
         }
     }
 
-    private fun getTasks(oldState: TasksScreenUiState) {
+    private fun getTasks(oldState: TrainScreenUiState) {
         viewModelScope.launch {
             setState(oldState.copy(isLoading = true))
 
@@ -125,7 +126,7 @@ class TasksViewModel @Inject constructor(private val trainRepository: TrainRepos
 
                     val errorMessage =
                         result.exception.message ?: "An error occurred when getting your task"
-                    setEffect { TaskScreenSideEffects.ShowSnackBarMessage(message = errorMessage) }
+                    setEffect { TrainScreenSideEffects.ShowSnackBarMessage(message = errorMessage) }
                 }
 
                 is Result.Success -> {
@@ -136,7 +137,7 @@ class TasksViewModel @Inject constructor(private val trainRepository: TrainRepos
         }
     }
 
-    private fun deleteNote(oldState: TasksScreenUiState, taskId: String) {
+    private fun deleteNote(oldState: TrainScreenUiState, taskId: String) {
         viewModelScope.launch {
             setState(oldState.copy(isLoading = true))
 
@@ -146,21 +147,21 @@ class TasksViewModel @Inject constructor(private val trainRepository: TrainRepos
 
                     val errorMessage =
                         result.exception.message ?: "An error occurred when deleting task"
-                    setEffect { TaskScreenSideEffects.ShowSnackBarMessage(message = errorMessage) }
+                    setEffect { TrainScreenSideEffects.ShowSnackBarMessage(message = errorMessage) }
                 }
 
                 is Result.Success -> {
                     setState(oldState.copy(isLoading = false))
 
-                    setEffect { TaskScreenSideEffects.ShowSnackBarMessage(message = "Task deleted successfully") }
+                    setEffect { TrainScreenSideEffects.ShowSnackBarMessage(message = "Task deleted successfully") }
 
-                    sendEvent(TasksScreenUiEvent.GetTasks)
+                    sendEvent(TrainScreenUiEvent.GetTrain)
                 }
             }
         }
     }
 
-    private fun updateNote(oldState: TasksScreenUiState) {
+    private fun updateNote(oldState: TrainScreenUiState) {
         viewModelScope.launch {
             setState(oldState.copy(isLoading = true))
 
@@ -180,7 +181,7 @@ class TasksViewModel @Inject constructor(private val trainRepository: TrainRepos
 
                     val errorMessage =
                         result.exception.message ?: "An error occurred when updating task"
-                    setEffect { TaskScreenSideEffects.ShowSnackBarMessage(message = errorMessage) }
+                    setEffect { TrainScreenSideEffects.ShowSnackBarMessage(message = errorMessage) }
                 }
 
                 is Result.Success -> {
@@ -192,33 +193,33 @@ class TasksViewModel @Inject constructor(private val trainRepository: TrainRepos
                         ),
                     )
 
-                    sendEvent(TasksScreenUiEvent.OnChangeUpdateTaskDialogState(show = false))
+                    sendEvent(TrainScreenUiEvent.OnChangeUpdateTrainDialogState(show = false))
 
-                    setEffect { TaskScreenSideEffects.ShowSnackBarMessage(message = "Task updated successfully") }
+                    setEffect { TrainScreenSideEffects.ShowSnackBarMessage(message = "Task updated successfully") }
 
-                    sendEvent(TasksScreenUiEvent.GetTasks)
+                    sendEvent(TrainScreenUiEvent.GetTrain)
                 }
             }
         }
     }
 
-    private fun onChangeAddTaskDialog(oldState: TasksScreenUiState, isShown: Boolean) {
+    private fun onChangeAddTaskDialog(oldState: TrainScreenUiState, isShown: Boolean) {
         setState(oldState.copy(isShowAddTaskDialog = isShown))
     }
 
-    private fun onUpdateAddTaskDialog(oldState: TasksScreenUiState, isShown: Boolean) {
+    private fun onUpdateAddTaskDialog(oldState: TrainScreenUiState, isShown: Boolean) {
         setState(oldState.copy(isShowUpdateTaskDialog = isShown))
     }
 
-    private fun onChangeTaskBody(oldState: TasksScreenUiState, body: String) {
+    private fun onChangeTaskBody(oldState: TrainScreenUiState, body: String) {
         setState(oldState.copy(currentTextFieldBody = body))
     }
 
-    private fun onChangeTaskTitle(oldState: TasksScreenUiState, title: String) {
+    private fun onChangeTaskTitle(oldState: TrainScreenUiState, title: String) {
         setState(oldState.copy(currentTextFieldTitle = title))
     }
 
-    private fun setTaskToBeUpdated(oldState: TasksScreenUiState, task: Task) {
+    private fun setTaskToBeUpdated(oldState: TrainScreenUiState, task: Task) {
         setState(oldState.copy(taskToBeUpdated = task))
     }
 }

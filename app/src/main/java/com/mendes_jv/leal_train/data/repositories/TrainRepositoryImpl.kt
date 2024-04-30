@@ -2,13 +2,13 @@ package com.mendes_jv.leal_train.data.repositories
 
 import android.util.Log
 import com.google.firebase.Timestamp
-import com.mendes_jv.leal_train.common.COLLECTION_PATH_NAME
 import com.mendes_jv.leal_train.common.PLEASE_CHECK_INTERNET_CONNECTION
 import com.mendes_jv.leal_train.common.Result
 import com.mendes_jv.leal_train.common.convertDateFormat
 import com.mendes_jv.leal_train.common.getCurrentTimeAsString
 import com.mendes_jv.leal_train.di.IoDispatcher
 import com.google.firebase.firestore.FirebaseFirestore
+import com.mendes_jv.leal_train.common.TRAIN_COLLECTION_PATH_NAME
 import com.mendes_jv.leal_train.data.model.Exercise
 import com.mendes_jv.leal_train.data.model.Train
 import kotlinx.coroutines.CoroutineDispatcher
@@ -44,7 +44,7 @@ class TrainRepositoryImpl @Inject constructor(
                 )
 
                 val addTrainTimeout = withTimeoutOrNull(10000L) {
-                    lealTrainDB.collection(COLLECTION_PATH_NAME)
+                    lealTrainDB.collection(TRAIN_COLLECTION_PATH_NAME)
                         .add(train)
                 }
 
@@ -67,7 +67,7 @@ class TrainRepositoryImpl @Inject constructor(
         return try {
             withContext(ioDispatcher) {
                 val fetchingTrainsTimeout = withTimeoutOrNull(10000L) {
-                    lealTrainDB.collection(COLLECTION_PATH_NAME)
+                    lealTrainDB.collection(TRAIN_COLLECTION_PATH_NAME)
                         .get()
                         .await()
                         .documents.map { document ->
@@ -107,7 +107,7 @@ class TrainRepositoryImpl @Inject constructor(
         return try {
             withContext(ioDispatcher) {
                 val addTrainTimeout = withTimeoutOrNull(10000L) {
-                    lealTrainDB.collection(COLLECTION_PATH_NAME)
+                    lealTrainDB.collection(TRAIN_COLLECTION_PATH_NAME)
                         .document(name.toString())
                         .delete()
                 }
@@ -146,7 +146,7 @@ class TrainRepositoryImpl @Inject constructor(
                 )
 
                 val addTrainTimeout = withTimeoutOrNull(10000L) {
-                    lealTrainDB.collection(COLLECTION_PATH_NAME)
+                    lealTrainDB.collection(TRAIN_COLLECTION_PATH_NAME)
                         .document(name.toString())
                         .update(trainUpdate)
                 }

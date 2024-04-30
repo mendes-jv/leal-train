@@ -1,4 +1,4 @@
-package com.mendes_jv.leal_train.feature_tasks.ui.components
+package com.mendes_jv.leal_train.feature_train.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,16 +23,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.mendes_jv.leal_train.feature_tasks.state.TasksScreenUiState
+import com.mendes_jv.leal_train.feature_train.state.TrainScreenUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTaskDialogComponent(
+fun UpdateTaskDialogComponent(
     setTaskTitle: (String) -> Unit,
     setTaskBody: (String) -> Unit,
     saveTask: () -> Unit,
     closeDialog: () -> Unit,
-    uiState: TasksScreenUiState,
+    task: Task?,
+    uiState: TrainScreenUiState,
 ) {
     Dialog(onDismissRequest = { closeDialog() }) {
         Surface(
@@ -47,7 +48,7 @@ fun AddTaskDialogComponent(
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         Text(
-                            text = "New Task",
+                            text = "Update Task",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                         )
@@ -63,6 +64,7 @@ fun AddTaskDialogComponent(
                             setTaskTitle(title)
                         },
                         label = { Text("Task Title") },
+                        placeholder = { Text(task?.title.toString() ?: "") },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
@@ -82,6 +84,7 @@ fun AddTaskDialogComponent(
                             setTaskBody(body)
                         },
                         label = { Text("Task Body") },
+                        placeholder = { Text(task?.body ?: "") },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
@@ -112,7 +115,7 @@ fun AddTaskDialogComponent(
                                 contentColor = Color.White,
                             ),
                         ) {
-                            Text(text = "Save Task")
+                            Text(text = "Update Task")
                         }
                     }
                 }

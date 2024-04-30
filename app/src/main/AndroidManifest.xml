@@ -14,7 +14,7 @@
         android:theme="@style/Theme.LealTrain"
         tools:targetApi="31">
         <activity
-            android:name=".feature_tasks.ui.NotesScreenActivity"
+            android:name=".feature_train.ui.NotesScreenActivity"
             android:exported="true"
             android:theme="@style/Theme.LealTrain">
             <intent-filter>

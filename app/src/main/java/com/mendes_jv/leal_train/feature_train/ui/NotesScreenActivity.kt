@@ -1,4 +1,4 @@
-package com.mendes_jv.leal_train.feature_tasks.ui
+package com.mendes_jv.leal_train.feature_train.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddCircle
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -30,14 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mendes_jv.leal_train.common.SIDE_EFFECTS_KEY
-import com.mendes_jv.leal_train.feature_tasks.events.TasksScreenUiEvent
-import com.mendes_jv.leal_train.feature_tasks.side_effects.TaskScreenSideEffects
-import com.mendes_jv.leal_train.feature_tasks.ui.components.AddTaskDialogComponent
-import com.mendes_jv.leal_train.feature_tasks.ui.components.EmptyComponent
-import com.mendes_jv.leal_train.feature_tasks.ui.components.LoadingComponent
-import com.mendes_jv.leal_train.feature_tasks.ui.components.TaskCardComponent
-import com.mendes_jv.leal_train.feature_tasks.ui.components.UpdateTaskDialogComponent
-import com.mendes_jv.leal_train.feature_tasks.viewmodel.TasksViewModel
+import com.mendes_jv.leal_train.feature_train.events.TrainScreenUiEvent
+import com.mendes_jv.leal_train.feature_train.side_effects.TrainScreenSideEffects
+import com.mendes_jv.leal_train.feature_train.ui.components.AddTaskDialogComponent
+import com.mendes_jv.leal_train.feature_train.ui.components.EmptyComponent
+import com.mendes_jv.leal_train.feature_train.ui.components.LoadingComponent
+import com.mendes_jv.leal_train.feature_train.ui.components.TaskCardComponent
+import com.mendes_jv.leal_train.feature_train.ui.components.UpdateTaskDialogComponent
+import com.mendes_jv.leal_train.feature_train.viewmodel.TrainViewModel
 import com.mendes_jv.leal_train.theme.TodoChampTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -46,21 +44,20 @@ import kotlinx.coroutines.flow.onEach
 @AndroidEntryPoint
 class NotesScreenActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val tasksViewModel: TasksViewModel = viewModel()
+            val trainViewModel: TrainViewModel = viewModel()
 
-            val uiState = tasksViewModel.state.collectAsState().value
-            val effectFlow = tasksViewModel.effect
+            val uiState = trainViewModel.state.collectAsState().value
+            val effectFlow = trainViewModel.effect
 
             val snackBarHostState = remember { SnackbarHostState() }
 
             LaunchedEffect(key1 = SIDE_EFFECTS_KEY) {
                 effectFlow.onEach { effect ->
                     when (effect) {
-                        is TaskScreenSideEffects.ShowSnackBarMessage -> {
+                        is TrainScreenSideEffects.ShowSnackBarMessage -> {
                             snackBarHostState.showSnackbar(
                                 message = effect.message,
                                 duration = SnackbarDuration.Short,
@@ -76,26 +73,26 @@ class NotesScreenActivity : ComponentActivity() {
                     AddTaskDialogComponent(
                         uiState = uiState,
                         setTaskTitle = { title ->
-                            tasksViewModel.sendEvent(
-                                event = TasksScreenUiEvent.OnChangeTaskTitle(title = title),
+                            trainViewModel.sendEvent(
+                                event = TrainScreenUiEvent.OnChangeTrainDescription(title = title),
                             )
                         },
                         setTaskBody = { body ->
-                            tasksViewModel.sendEvent(
-                                event = TasksScreenUiEvent.OnChangeTaskBody(body = body),
+                            trainViewModel.sendEvent(
+                                event = TrainScreenUiEvent.OnChangeTaskBody(body = body),
                             )
                         },
                         saveTask = {
-                            tasksViewModel.sendEvent(
-                                event = TasksScreenUiEvent.AddTask(
+                            trainViewModel.sendEvent(
+                                event = TrainScreenUiEvent.AddTrain(
                                     title = uiState.currentTextFieldTitle,
                                     body = uiState.currentTextFieldBody,
                                 ),
                             )
                         },
                         closeDialog = {
-                            tasksViewModel.sendEvent(
-                                event = TasksScreenUiEvent.OnChangeAddTaskDialogState(show = false),
+                            trainViewModel.sendEvent(
+                                event = TrainScreenUiEvent.OnChangeAddTrainDialogState(show = false),
                             )
                         },
                     )
@@ -105,21 +102,21 @@ class NotesScreenActivity : ComponentActivity() {
                     UpdateTaskDialogComponent(
                         uiState = uiState,
                         setTaskTitle = { title ->
-                            tasksViewModel.sendEvent(
-                                event = TasksScreenUiEvent.OnChangeTaskTitle(title = title),
+                            trainViewModel.sendEvent(
+                                event = TrainScreenUiEvent.OnChangeTrainDescription(title = title),
                             )
                         },
                         setTaskBody = { body ->
-                            tasksViewModel.sendEvent(
-                                event = TasksScreenUiEvent.OnChangeTaskBody(body = body),
+                            trainViewModel.sendEvent(
+                                event = TrainScreenUiEvent.OnChangeTaskBody(body = body),
                             )
                         },
                         saveTask = {
-                            tasksViewModel.sendEvent(event = TasksScreenUiEvent.UpdateNote)
+                            trainViewModel.sendEvent(event = TrainScreenUiEvent.UpdateTrain)
                         },
                         closeDialog = {
-                            tasksViewModel.sendEvent(
-                                event = TasksScreenUiEvent.OnChangeUpdateTaskDialogState(show = false),
+                            trainViewModel.sendEvent(
+                                event = TrainScreenUiEvent.OnChangeUpdateTrainDialogState(show = false),
                             )
                         },
                         task = uiState.taskToBeUpdated,
@@ -147,8 +144,8 @@ class NotesScreenActivity : ComponentActivity() {
                                     )
                                 },
                                 onClick = {
-                                    tasksViewModel.sendEvent(
-                                        event = TasksScreenUiEvent.OnChangeAddTaskDialogState(show = true),
+                                    trainViewModel.sendEvent(
+                                        event = TrainScreenUiEvent.OnChangeAddTrainDialogState(show = true),
                                     )
                                 },
                                 modifier = Modifier.padding(horizontal = 12.dp),
@@ -168,7 +165,7 @@ class NotesScreenActivity : ComponentActivity() {
                             !uiState.isLoading && uiState.tasks.isNotEmpty() -> {
                                 LazyColumn(contentPadding = PaddingValues(14.dp)) {
                                     item {
-                                        com.mendes_jv.leal_train.feature_tasks.ui.components.WelcomeMessageComponent()
+                                        com.mendes_jv.leal_train.feature_train.ui.components.WelcomeMessageComponent()
 
                                         androidx.compose.foundation.layout.Spacer(
                                             modifier = Modifier.height(
@@ -182,20 +179,20 @@ class NotesScreenActivity : ComponentActivity() {
                                             task = task,
                                             deleteTask = { taskId ->
                                                 Log.d("TASK_ID: ", taskId)
-                                                tasksViewModel.sendEvent(
-                                                    event = TasksScreenUiEvent.DeleteNote(taskId = taskId),
+                                                trainViewModel.sendEvent(
+                                                    event = TrainScreenUiEvent.DeleteTrain(taskId = taskId),
                                                 )
                                             },
                                             updateTask = { taskToBeUpdated ->
-                                                tasksViewModel.sendEvent(
-                                                    TasksScreenUiEvent.OnChangeUpdateTaskDialogState(
+                                                trainViewModel.sendEvent(
+                                                    TrainScreenUiEvent.OnChangeUpdateTrainDialogState(
                                                         show = true,
                                                     ),
                                                 )
 
-                                                tasksViewModel.sendEvent(
-                                                    event = TasksScreenUiEvent.SetTaskToBeUpdated(
-                                                        taskToBeUpdated = taskToBeUpdated,
+                                                trainViewModel.sendEvent(
+                                                    event = TrainScreenUiEvent.SetTrainToBeUpdated(
+                                                        trainToBeUpdated = taskToBeUpdated,
                                                     ),
                                                 )
                                             },
